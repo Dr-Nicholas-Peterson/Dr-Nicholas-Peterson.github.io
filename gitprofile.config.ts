@@ -80,14 +80,14 @@ const CONFIG = {
       'file:///C:/Users/Nick/Downloads/Statement%20of%20purpose%20and%20CV%20Nicholas%20Peterson.pdf', // Empty fileUrl will hide the `Download Resume` button.
   },
   skills: [
-    'PCR', 'Bioinformatics', 'Teaching'
+    'Jack of all trades, master of none', 'Bioinformatics', 'I have been at college for four years, I have no skills, blank canvas'
   ],
   experiences: [
     {
       company: 'CSU Stanislaus',
-      position: 'Master Professor',
-      from: 'August 2022',
-      to: 'Present',
+      position: 'Lowly Peon',
+      from: 'August 2019',
+      to: 'May 2024',
       companyLink: 'https://www.csustan.edu',
     },
     {
@@ -100,7 +100,7 @@ const CONFIG = {
   ],
   certifications: [
     {
-      name: 'Lorem ipsum',
+      name: 'certified idiot',
       body: 'Lorem ipsum dolor sit amet',
       year: 'March 2022',
       link: 'https://example.com',
