@@ -185,7 +185,7 @@ const CONFIG = {
       'forest',
       'aqua',
       'lofi',
-      'pastel',
+      'cupcake',
       'fantasy',
       'wireframe',
       'black',
