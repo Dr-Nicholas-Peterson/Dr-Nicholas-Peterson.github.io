@@ -52,13 +52,13 @@ const CONFIG = {
     },
   },
   seo: {
-    title: 'Portfolio of Tricia Van Laar',
+    title: 'Portfolio of Nicholas Peterson',
     description: '',
     imageURL: '',
   },
   social: {
-    linkedin: 'triciavanlaar',
-    twitter: 'tvanlaarmicro',
+    linkedin: '',
+    twitter: '',
     mastodon: '',
     researchGate: '',
     facebook: '',
@@ -71,9 +71,9 @@ const CONFIG = {
     stackoverflow: '', // example: '1/jeff-atwood'
     skype: '',
     telegram: '',
-    website: 'https://tvanlaar.github.io',
+    website: '',
     phone: '',
-    email: 'tvanlaar@csustan.edu',
+    email: 'npeterson3@csustan.edu',
   },
   resume: {
     fileUrl:
@@ -85,17 +85,17 @@ const CONFIG = {
   experiences: [
     {
       company: 'CSU Stanislaus',
-      position: 'Assistant Professor',
+      position: 'Master Professor',
       from: 'August 2022',
       to: 'Present',
       companyLink: 'https://www.csustan.edu',
     },
     {
-      company: 'CSU Fresno',
-      position: 'Assistant/Associate Professor',
-      from: 'August 2015',
-      to: 'August 2022',
-      companyLink: 'https://www.fresnostate.edu',
+      company: '',
+      position: '',
+      from: '',
+      to: '',
+      companyLink: '',
     },
   ],
   certifications: [
@@ -108,16 +108,16 @@ const CONFIG = {
   ],
   educations: [
     {
-      institution: 'CSU Fresno',
-      degree: 'MBA',
-      from: '2020',
-      to: '2024',
+      institution: '',
+      degree: '',
+      from: '',
+      to: '',
     },
     {
-      institution: 'University of Texas at San Antonio',
-      degree: 'PhD',
-      from: '2007',
-      to: '2012',
+      institution: '',
+      degree: '',
+      from: '',
+      to: '',
     },
   ],
   publications: [
