@@ -1,0 +1,200 @@
+To run a command as administrator (user "root"), use "sudo <command>".
+See "man sudo_root" for details.
+
+# Conda environment activation, the demux is a toolkit that summarizes the demultiplexed sequence data.
+
+(base) nick@MSI:/mnt/c/Users/Nick/Desktop/bioinformatics/microbiomesectionreport$ conda activate qiime2-amplicon-2024.2
+(qiime2-amplicon-2024.2) nick@MSI:/mnt/c/Users/Nick/Desktop/bioinformatics/microbiomesectionreport$ qiime demux summarize \
+  --i-data demux.qza \
+  --o-visualization demux.qzv
+
+Saved Visualization to: demux.qzv
+
+# Provides "quality" filtering on demultiplexed data based on quality scores.
+
+qiime quality-filter q-score \
+ --i-demux demux.qza \
+ --o-filtered-sequences demux-filtered.qza \
+ --o-filter-stats demux-filter-stats.qza
+
+Saved SampleData[SequencesWithQuality] to: demux-filtered.qza
+Saved QualityFilterStats to: demux-filter-stats.qza
+
+# Creates visualization summaries of our statistics.
+
+qiime metadata tabulate \
+  --m-input-file demux-filter-stats.qza \
+  --o-visualization demux-filter-stats.qzv
+qiime deblur visualize-stats \
+  --i-deblur-stats deblur-stats.qza \
+  --o-visualization deblur-stats.qzv
+Saved Visualization to: demux-filter-stats.qzv
+Usage: qiime deblur visualize-stats [OPTIONS]
+
+  Display Deblur statistics per sample
+
+Inputs:
+  --i-deblur-stats ARTIFACT
+    DeblurStats        Summary statistics of the Deblur process.    [required]
+Outputs:
+  --o-visualization VISUALIZATION
+                                                                    [required]
+Miscellaneous:
+  --output-dir PATH    Output unspecified results to a directory
+  --verbose / --quiet  Display verbose output to stdout and/or stderr during
+                       execution of this action. Or silence output if
+                       execution is successful (silence is golden).
+  --example-data PATH  Write example data and exit.
+  --citations          Show citations and exit.
+  --help               Show this message and exit.
+
+Examples:
+  # ### example: visualize stats
+  qiime deblur visualize-stats \
+    --i-deblur-stats deblur-stats.qza \
+    --o-visualization deblur-stats-viz.qzv
+
+# Below...
+
+qiime dada2 denoise-paired \              #Initiates the Dada2 denoising process for paired-end sequencing data.
+  --i-demultiplexed-seqs demux.qza \      #reads that have been demultiplexed, they have been sorted into individual samples
+  --p-trim-left-f 10 \                    #10 bases are being trimmed from the 5' end of the forward reads
+  --p-trunc-len-f 240 \                   #forward reads are truncated to a length of 240 bases
+  --p-trim-left-r 10 \                    #10 bases are being trimmed from the 5' end of the forward reads
+  --p-trunc-len-r 220 \                   #reverse reads are truncated to a length of 220 bases
+  --o-representative-sequences rep-seqs-dada2.qza \  #the rep seq generated will be saved
+  --o-table table-dada2.qza \                 #generates a table
+  --o-denoising-stats stats-dada2.qza         #saves the denoising statistics
+Saved FeatureTable[Frequency] to: table-dada2.qza
+Saved FeatureData[Sequence] to: rep-seqs-dada2.qza
+Saved SampleData[DADA2Stats] to: stats-dada2.qza
+
+#below... 
+
+qiime metadata tabulate \                 #creates tabular summary from my metadata1 file
+  --m-input-file stats-dada2.qza \        #contains the denoising statistics
+  --o-visualization stats-dada2.qzv       #a visualization of your denoising statistics
+Saved Visualization to: stats-dada2.qzv   #means the tabular visualization has been generated and saved
+
+#Renames the files to a standard name
+
+mv rep-seqs-dada2.qza rep-seqs.qza       #renames the file from "rep-seqs-dada2.qza" to "rep-seqs.qza"
+mv table-dada2.qza table.qza             #renames the file from "table-dada2.qza" to "table.qza"
+mv stats-dada2.qza stats.qza             #renames the file from "stats-dada2.qza" to "stats.qza"
+
+#This chunk creates a table from my metadata1 file
+
+qiime feature-table summarize \
+  --i-table table.qza \                   #table input
+  --o-visualization table.qzv \           #where the table visual will be saved
+  --m-sample-metadata-file metadata.txt   #includes only sample from the metadata?
+qiime feature-table tabulate-seqs \       #summarizes the feature sequences stored
+  --i-data rep-seqs.qza \                 #specifies the input feature
+  --o-visualization rep-seqs.qzv          # where the visual will be saved
+Saved Visualization to: table.qzv
+Saved Visualization to: rep-seqs.qzv
+
+#Creates a phylogenetic tree from our sequence data
+
+qiime phylogeny align-to-tree-mafft-fasttree \
+  --i-sequences rep-seqs.qza \
+  --o-alignment aligned-rep-seqs.qza \
+  --o-masked-alignment masked-aligned-rep-seqs.qza \
+  --o-tree unrooted-tree.qza \
+  --o-rooted-tree rooted-tree.qza
+Saved FeatureData[AlignedSequence] to: aligned-rep-seqs.qza
+Saved FeatureData[AlignedSequence] to: masked-aligned-rep-seqs.qza
+Saved Phylogeny[Unrooted] to: unrooted-tree.qza
+Saved Phylogeny[Rooted] to: rooted-tree.qza
+
+#Calculates our Alpha (faith's phylogentic diversity, observed features, shannon diversity, evenness) and Beta diversity (unweighted unifrax distance matrix, weighted unifrax distance matrix, Jaccard distance matrix, Bray-Curtis distance matrix).
+
+qiime diversity core-metrics-phylogenetic \
+  --i-phylogeny rooted-tree.qza \
+  --i-table table.qza \
+  --p-sampling-depth 4530 \
+  --m-metadata-file metadata.txt \
+  --output-dir core-metrics-results
+Saved FeatureTable[Frequency] to: core-metrics-results/rarefied_table.qza
+Saved SampleData[AlphaDiversity] to: core-metrics-results/faith_pd_vector.qza
+Saved SampleData[AlphaDiversity] to: core-metrics-results/observed_features_vector.qza
+Saved SampleData[AlphaDiversity] to: core-metrics-results/shannon_vector.qza
+Saved SampleData[AlphaDiversity] to: core-metrics-results/evenness_vector.qza
+Saved DistanceMatrix to: core-metrics-results/unweighted_unifrac_distance_matrix.qza
+Saved DistanceMatrix to: core-metrics-results/weighted_unifrac_distance_matrix.qza
+Saved DistanceMatrix to: core-metrics-results/jaccard_distance_matrix.qza
+Saved DistanceMatrix to: core-metrics-results/bray_curtis_distance_matrix.qza
+Saved PCoAResults to: core-metrics-results/unweighted_unifrac_pcoa_results.qza
+Saved PCoAResults to: core-metrics-results/weighted_unifrac_pcoa_results.qza
+Saved PCoAResults to: core-metrics-results/jaccard_pcoa_results.qza
+Saved PCoAResults to: core-metrics-results/bray_curtis_pcoa_results.qza
+Saved Visualization to: core-metrics-results/unweighted_unifrac_emperor.qzv
+Saved Visualization to: core-metrics-results/weighted_unifrac_emperor.qzv
+Saved Visualization to: core-metrics-results/jaccard_emperor.qzv
+Saved Visualization to: core-metrics-results/bray_curtis_emperor.qzv
+
+#Tests for significant differences in alphha diversity metrics between our samples
+
+qiime diversity alpha-group-significance \
+  --i-alpha-diversity core-metrics-results/evenness_vector.qza \
+  --m-metadata-file metadata.txt \
+  --o-visualization core-metrics-results/evenness-group-significance.qzv
+Saved Visualization to: core-metrics-results/evenness-group-significance.qzv
+
+#Initiates the dowload of the classifier from the URL and saves it as 
+"gg-13-8-99-515-806-nb-classifier.qza"
+
+wget \
+  -O "gg-13-8-99-515-806-nb-classifier.qza" \
+  "https://data.qiime2.org/2024.2/common/gg-13-8-99-515-806-nb-classifier.qza"
+--2024-04-30 14:23:48--  https://data.qiime2.org/2024.2/common/gg-13-8-99-515-806-nb-classifier.qza
+Resolving data.qiime2.org (data.qiime2.org)... 54.200.1.12
+Connecting to data.qiime2.org (data.qiime2.org)|54.200.1.12|:443... connected.
+HTTP request sent, awaiting response... 302 FOUND
+Location: https://s3-us-west-2.amazonaws.com/qiime2-data/2024.2/common/gg-13-8-99-515-806-nb-classifier.qza [following]
+--2024-04-30 14:23:48--  https://s3-us-west-2.amazonaws.com/qiime2-data/2024.2/common/gg-13-8-99-515-806-nb-classifier.qza
+Resolving s3-us-west-2.amazonaws.com (s3-us-west-2.amazonaws.com)... 52.92.204.24, 52.92.178.200, 52.92.184.0, ...
+Connecting to s3-us-west-2.amazonaws.com (s3-us-west-2.amazonaws.com)|52.92.204.24|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 28289645 (27M) [binary/octet-stream]
+Saving to: ‘gg-13-8-99-515-806-nb-classifier.qza’
+
+gg-13-8-99-515-806-nb-classif 100%[=================================================>]  26.98M  8.20MB/s    in 3.3s
+
+2024-04-30 14:23:51 (8.20 MB/s) - ‘gg-13-8-99-515-806-nb-classifier.qza’ saved [28289645/28289645]
+
+#The classifier is labeling the unknown species in our dataset
+
+qiime feature-classifier classify-sklearn \
+  --i-classifier gg-13-8-99-515-806-nb-classifier.qza \
+  --i-reads rep-seqs.qza \
+  --o-classification taxonomy.qza
+
+qiime metadata tabulate \
+  --m-input-file taxonomy.qza \
+  --o-visualization taxonomy.qzv
+Saved FeatureData[Taxonomy] to: taxonomy.qza
+Saved Visualization to: taxonomy.qzv
+
+#It creates the barplot
+
+qiime taxa barplot \
+  --i-table table.qza \
+  --i-taxonomy taxonomy.qza \
+  --m-metadata-file metadata1.txt \
+  --o-visualization taxa-bar-plots.qzv
+Saved Visualization to: taxa-bar-plots.qzv
+
+#This chunk is performing alpha diversity group significance tests with Shannon diversity and evenness.
+
+qiime diversity alpha-group-significance \
+  --i-alpha-diversity core-metrics-results/shannon_vector.qza \
+  --m-metadata-file metadata1.txt \
+  --o-visualization core-metrics-results/faith-pd-group-significance.qzv
+
+qiime diversity alpha-group-significance \
+  --i-alpha-diversity core-metrics-results/evenness_vector.qza \
+  --m-metadata-file metadata1.txt \
+  --o-visualization core-metrics-results/evenness-group-significance.qzv
+Saved Visualization to: core-metrics-results/faith-pd-group-significance.qzv
+Saved Visualization to: core-metrics-results/evenness-group-significance.qzv
